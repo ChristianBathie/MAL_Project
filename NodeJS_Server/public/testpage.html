@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="/css/style.css">
+		<script src="/js/client.js"></script>
+		<title>Test Page</title>
+	</head>
+		
+	<body onload="getUsers()">
+		
+		<div id="content">
+		
+			<p>
+				Posted Str: <span id="postData"></span>
+			</p>
+			<br>
+			<form id="addUserForm" action="" onsubmit="return postUser();">
+				<div>
+					<label for="name">User Name</label><br>
+					<input type="text" name="name" id="name" required>
+				</div>
+				<div>
+					<label for="pass">Password</label><br>
+					<input type="text" name="pass" id="pass" required>
+				</div>
+				<div>
+					<label for="prof">Company</label><br>
+					<input type="text" name="comp" id="comp" required>
+				</div>
+				
+				<div class="footer">
+					<input type="reset" value="Clear" />
+					<input type="submit" value="Post" />
+				</div>
+			</form>
+			<br>
+			<table id="jsonTable">
+				<tr>
+					<th onclick="sortTable('id')"><div>ID</div></th>
+					<th onclick="sortTable('name')"><div>Name</div></th>
+					<th onclick="sortTable('password')"><div>Password</div></th>
+					<th onclick="sortTable('company')"><div>Company</div></th>
+				</tr>
+				<tbody id="jsonTableBody">
+				</tbody>
+			</table>
+			
+		</div>
+		
+	</body>
+	
+</html>

@@ -1,0 +1,830 @@
+/*
+File: 		style.css
+Author:		Christian Bathie
+Student #:	3232451
+Date: 		11/09/2015
+*/
+
+body
+{
+	background-color: #30a5bb;
+	color: black;
+	margin: 0;
+	margin-bottom: 4%;
+}
+
+h1
+{
+	text-transform: uppercase;
+    position: relative;
+	text-align: center;
+}
+
+li > p
+{
+	font-family: "consolas", monospace;
+}
+
+#content
+{
+	margin-top: 60px;
+}
+
+/* Navigation Bar */
+
+#navBar ul 
+{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#navBar li 
+{
+    float: left;
+}
+
+#navBar li a 
+{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+	text-decoration: none;
+}
+
+#navBar li:not(.active) a:hover
+{
+    background-color: #111;
+}
+
+#navBar .active
+{
+    background-color: #ee7e08; /* Orange */
+}
+
+#navBar li.logout 
+{
+    float: right;
+}
+
+/* Homepage */
+
+#homeDiv
+{
+	width: 100%;
+	height: 400px;
+	display: block;
+	margin: 0;
+	margin-top: 20px;
+	padding: 0;
+}
+
+#homeDiv > div
+{
+	display: block;
+	height: 45%;
+	width: 45%;
+	border-radius: 15px;
+	text-align: center;
+	background-color: #dfdfdf;
+}
+
+
+#homeDiv a
+{
+	text-decoration: none;	
+}
+
+
+#homeDiv a > div
+{
+	width:100%;
+	padding: 10px 0 8px;
+	background-color: #333333;
+	text-decoration: none;
+	color: white;
+	font-weight: bold;
+	font-family: sans-serif;
+}
+
+#homeDiv a > div:hover
+{
+    background-color: #151515;
+}
+
+#homeDiv .left
+{
+	float: left;
+	margin-left: 4%;
+}
+
+#homeDiv .right
+{
+	float: right;
+	margin-right: 4%;
+}
+
+#homeDiv .top
+{
+	top: 0;
+	margin-top: 4%;
+}
+
+#homeDiv .bottom
+{
+	bottom: 0;
+	margin-bottom: 4%;
+	margin-top: 2%;
+}
+
+#homeDiv .top.left, #homeDiv .bottom.right
+{
+	background-color: #eeeeee;
+}
+
+#homeDiv div.description
+{
+	padding: 10px;
+	line-height: 1.5;
+	text-align: left;
+	font-family: sans-serif;
+}
+
+/* KnowledgeBase/Issue Category List */
+
+#categoryList
+{
+	font-family: sans-serif;
+}
+
+#categoryList ul
+{
+	list-style-type: none;
+    margin: auto;
+	padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    width: 200px;
+}
+
+#categoryList li 
+{
+    width: 100%;
+}
+
+#categoryList li.title
+{
+	background-color;: #444444;
+	width: 100%;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 0px 14px 0px;
+    text-decoration: none;
+	font-weight: bold;
+}
+
+#categoryList li a
+{
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+	background-color: #dddddd;
+}
+
+#categoryList li a:hover 
+{
+    background-color: #ff9b49;
+}
+
+
+/* Notifications */
+
+#notificationSection
+{
+	margin: auto;
+	padding-bottom: 1px;
+	width: 45%;
+	max-width:1000px;
+	min-width: 500px;
+	background-color: #222222;
+}
+
+#notificationSectionTitle
+{
+	background-color: #424242;
+	color: white;
+    margin: 0;
+	padding-top: 5px;
+    overflow: hidden;
+    top: 0;
+    width: 100%;
+	height: 25px;
+	text-align: center;
+	text-transform: bold;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+.notification
+{
+	background-color: #a0e0ff;
+	margin: 5px;
+	padding: 1%;
+	overflow: auto;
+	font-family: arial,sans-serif;
+}
+
+.notification .title
+{
+	text-align: center;
+	/*font-weight: bold;*/
+}
+
+.notification .message
+{
+	width: 99%;
+	margin: auto;
+	padding: 3px;
+	background-color: white;
+	text-top: 0;
+	font-size: 14px;
+}
+
+.notification .dateTime
+{
+	display: inline-block;
+	font-family: monospace;
+	clear:both;
+}
+
+.notification .link
+{
+	display: block;
+	float: right;
+	clear: both;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+	margin:2px;
+}
+
+/* ISSUE PAGE */
+/* Issue Action */
+
+#issueAction
+{
+	margin: auto;
+	width: 55%;
+	max-width:1100px;
+	min-width: 550px;
+}
+
+#issueStateForm, #issueStateComplete
+{
+	margin: auto;
+	width: 55%;
+	max-width:1100px;
+	min-width: 550px;
+}
+
+/* ISSUE PAGE */
+/* Issue */
+
+#issue
+{
+	margin: auto;
+	padding-bottom: 1px;
+	width: 55%;
+	max-width:1100px;
+	min-width: 550px;
+    border-radius: 3px;
+	border: 5px solid transparent;
+    -webkit-border-image: url("images/construction_pattern.png") 90 round; /* Safari 3.1-5 */
+    -o-border-image:  url("images/construction_pattern.png") 90 round; /* Opera 11-12.1 */
+    border-image:  url("images/construction_pattern.png") 90 round;
+	background-color: #dddddd;
+	font-family: "Arial Black", Gadget, sans-serif;
+	font-size: 12px;
+}
+
+#issue .title
+{
+	background-color: #aaaaaa;
+	margin-top: 7px;
+	padding: 3px;
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	color: black;
+}
+
+#issue .category,.dateTime
+{
+	font-family:monospace;
+	font-size: 12px;
+	display: inline-block;
+	padding: 2px 2px 0px 3px; /* top right bottom left */
+}
+
+#issue .description
+{
+	width: 98%;
+	margin: auto;
+	display: block;
+	margin: 3px;
+	padding: 3px;
+	background-color: white;
+	text-top: 0;
+	font-size: 14px;
+	font-style: italic;
+	overflow: auto;
+}
+
+/* ISSUE PAGE */
+/* Attachments */
+
+#attachment
+{
+	margin: auto;
+	padding-bottom: 1px;
+	width: 35%;
+    border-radius: 6px;
+	max-width: 350px;
+	min-width: 300px;
+	background-color: #dddddd;
+}
+
+#attachment .title
+{
+	background-color: #404040;
+	color: white;
+	margin: 0;
+	padding: 0;
+	padding-top: 5px;
+	overflow: hidden;
+	top: 0;
+	width: 100%;
+	height: 25px;
+	text-align: center;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+#attachment input
+{
+	margin: 3px;
+}
+
+#attachment div > a
+{
+	display: block;
+	float: left;
+	margin-left: 5px;
+	padding: 3px 0 3px;
+	width:80%;
+	text-align: left;
+}
+
+#removeFile
+{
+	display: inline;
+}
+/* ISSUE PAGE */
+/* Comments */
+
+#commentSection
+{
+	margin: auto;
+	padding-bottom: 1px;
+	width: 45%;
+	max-width:1000px;
+	min-width: 500px;
+	/*background-color: #40c5ff;*/
+	background-color: #242424;
+}
+
+#commentSectionTitle
+{
+	background-color: #404040;
+	color: white;
+    margin: 0;
+    padding: 0;
+	padding-top: 5px;
+    overflow: hidden;
+    top: 0;
+    width: 100%;
+	height: 25px;
+	text-align: center;
+	text-transform: bold;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+#newComment /* Comment Submission Form */
+{
+	margin: auto;
+	padding: 1%;
+	overflow: auto;
+}
+
+#newComment textarea /* Comment Submission Form */
+{
+	margin: auto;
+	display: block;
+	width: 95%;
+    height: 40px;
+    padding: 8px 8px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    /*background-color: #f8f8f8;*/
+    font-size: 12px;
+    resize: none;
+}
+
+#newComment input[type=submit] /* Comment Submission Form */
+{
+	margin: 2px 3px;
+	float: right;
+}
+
+.comment
+{
+	background-color: #c7e0ff;
+	border-radius: 5px 10px 10px 20px; /*top-left, top-right, bottom-right, bottom-left*/
+	margin: 3px;
+	margin: 1% 3px 1% 3px;
+	padding: 2px;
+	overflow: auto;
+}
+
+.comment.User
+{
+	background-color: #c7e0ff;
+}
+
+.comment.Staff
+{
+	background-color: #ffcccc;
+}
+
+.comment .header
+{
+	display: block;
+	width: 100%;
+	color: black;
+	font-size: 0.875em;
+}
+
+.comment .username
+{
+	float: left;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font-size: 0.8em;
+	text-align: left;
+}
+
+.comment .dateTime
+{
+	font-family: monospace;
+	float: right;
+	/*text-align:right;*/
+	padding: 3px 5px;
+}
+
+.comment .message
+{
+	border-radius: 3px 10px 5px;
+	width: 98%;
+	margin: auto;
+	margin-bottom: 2px;
+	padding: 0.25%;
+	display: block;
+	clear: both;
+	background-color: white;
+    text-decoration: none;
+    font-size: 0.9em;
+	font-family: arial,sans-serif;
+}
+
+/* Knowledge Base AND Issue List */
+
+#jsonTable 
+{
+    border-collapse: collapse;
+    width: 65%;
+	min-width: 550px;
+	margin: auto;
+	font-family: sans-serif;
+	text-align: center;
+}
+
+#jsonTable th, td 
+{
+    border-bottom: 1px solid #ddd;
+}
+
+#jsonTable td:nth-child(1) /* first column */
+{  
+  text-align: center;
+}
+
+#jsonTable tr:nth-child(even)
+{
+	background-color: #ffffff;
+}
+
+#jsonTable tr:nth-child(odd)
+{
+	background-color: #ffe1cc;
+}
+
+#jsonTable th
+{
+    padding: 3px;
+	background-color: #444444;
+	color: white;
+	font-weight: bold;
+}
+
+#jsonTable th a
+{
+	text-decoration: none;
+	color: white;
+}
+
+#jsonTable th div
+{
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+#jsonTable th div:hover
+{
+	background-color: #555555;
+	cursor:pointer;
+}
+
+#jsonTable th span
+{
+	color: orange;
+}
+
+#jsonTable tr:nth-child(1) th
+{
+	background-color: #333333;
+	font-size: 20px;
+}
+
+#jsonTable td
+{
+    padding: 0;
+}
+
+#jsonTable td div
+{
+	width: 100%;
+	height: 100%;
+	padding: 8px;
+	margin: 0;
+}
+
+#jsonTable tr:hover 
+{
+	background-color: #aaaaaa;
+}
+
+/* Submit Issue Page */
+
+#submitIssueForm
+{
+	border-radius: 8px;
+	background-color: #e5e5e5;
+	margin: auto;
+	margin-top: 25px;
+	width: 50%;
+	max-width:600px;
+	min-width: 500px;
+	overflow: hidden;
+	color: black;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+#submitIssueForm .title
+{
+	padding: 5px;
+	background-color: #333333;
+	color: white;
+	display: block;
+	width: 100%;
+	padding: 2px 3px 3px 3px;
+	text-align: center;
+	font-size: 18px;
+}
+
+#submitIssueForm div
+{
+	padding: 1px;
+	margin-bottom: 2px;
+}
+
+#submitIssueForm fieldset
+{
+	padding: 1%;
+}
+
+#submitIssueForm label
+{
+    display: block;
+    float: left;
+    clear: left;
+    text-align: left;
+	font-size: 14px
+}
+
+#submitIssueForm input
+{
+	display: block;
+	padding: 2px;
+}
+
+#submitIssueForm textarea /* Comment Submission Form */
+{
+	margin: auto;
+	display: block;
+	width: 96%;
+    height: 60px;
+    padding: 6px 6px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    /*background-color: #f8f8f8;*/
+    font-size: 12px;
+    resize: none;
+	overflow: auto;
+}
+
+#submitIssueForm div.footer
+{
+	width: 95%;
+	display: block;
+	margin: auto;
+	clear:both;
+}
+
+#submitIssueForm input[type=reset]
+{
+	display: inline-block;
+	width: 35%;
+	float: left;
+}
+
+#submitIssueForm input[type=submit]
+{
+	display: inline-block;
+	width: 35%;
+	float: right;
+}
+
+
+/* Login */
+
+#loginForm
+{
+	border-radius: 20px;
+	background-color: #bbbbbb;
+	margin: auto;
+	margin-top: 25px;
+	width: 200px;
+	height: 155px;
+	overflow: hidden;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+#loginForm .title
+{
+	padding: 5px;
+	background-color: #555555;
+	color: white;
+	display: block;
+	width: 100%;
+	padding: 2px 3px 3px 3px;
+	text-align: center;
+	font-size: 18px;
+}
+
+#loginForm .fields
+{
+	padding: 5px;
+	display: block;
+	margin: 2px 10px 5px 10px;
+	width: 80%;
+}
+
+#loginForm .fields label
+{
+    display: block;
+    float: left;
+    clear: left;
+    text-align: left;
+	font-size: 14px;
+}
+
+#loginForm .fields input
+{
+	display: block;
+	width: 160px;
+	padding: 2px;
+}
+
+#loginForm input[type=submit]
+{
+	display: block;
+	padding: 2px 6px;
+	margin-top: 0;
+	margin-right: 20px;
+	float: right;
+}
+
+/* EVERYTHING BELOW HERE IS JUST REFERENCE FOR LATER, AND IS UNUSED */
+
+#animatedThing
+{
+    -webkit-animation-name: example; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: 3s; /* Chrome, Safari, Opera */
+    -webkit-animation-iteration-count: infinite; /* Chrome, Safari, Opera */
+    animation-name: example;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes solutionAnimation /* Animation for solution comment's border */
+{
+    0%   {border-color:yellow;}
+	20%  {border-color:yellow;}
+    50%  {border-color:black;}
+	80%  {border-color:yellow;}
+    100% {border-color:yellow;}
+}
+/* Standard syntax */
+@keyframes solutionAnimation /* Animation for solution comment's border */
+{
+    0%   {border-color:yellow;}
+	20%  {border-color:yellow;}
+    50%  {border-color:black;}
+	80%  {border-color:yellow;}
+    100% {border-color:yellow;}
+}
+
+.comment.solution
+{
+	/*background-color: #ffff66;*/
+	border: 3px solid yellow;
+	-webkit-animation-name: solutionAnimation; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: 2s; /* Chrome, Safari, Opera */
+    -webkit-animation-iteration-count: infinite; /* Chrome, Safari, Opera */
+    animation-name: solutionAnimation;
+    animation-duration: 3s;
+    animation-iteration-count: 3;
+}
+
+/* Buttons */
+
+.button 
+{
+    background-color: #edd907; /* Yellow */
+    border: none;
+    color: white;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.button1 
+{
+    background-color: #edd907;
+    color: #202020;
+	border: 2px solid grey;
+}
+
+.button1:hover 
+{
+    background-color: LightYellow;
+    color: black;
+    border: 2px solid grey;
+}
