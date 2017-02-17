@@ -3,7 +3,7 @@ import pymysql
 class MALDb:
     
     def __init__(self, connection = None):
-        if connection == None:  
+        if connection is None:  
             self.connection = pymysql.connect(host='localhost', port=3306, user='root', password='admin1234', db='mal_project', charset='utf8')
         self.cursor = connection.cursor()
     
@@ -114,9 +114,9 @@ class MALDb:
             # Execute the SQL command
             self.cursor.execute(sql, values)
             # Commit your changes in the database
-            output = 'Insert made into '+tableName+' table\n'
-            output += ' -> ' + str(values[0:2])
-            printUnicode(output=output)
+            ## output = 'Insert made into '+tableName+' table\n'
+            ## output += ' -> ' + str(values[0:2])
+            ## printUnicode(output=output)
             self.connection.commit()
             return True
         except Exception as e:
