@@ -11,9 +11,16 @@ class MALScraper:
             session = requests.Session()
         self.session = session
         
-    def resetSession():
+    def resetSession(sleepPeriod = 0):
+        print('Scraper: resetting session')
+        self.session.close()
         self.session = None
+        if (sleepPeriod > 0):
+            sleepPrinted(sleepPeriod)
         self.session = requests.Session()
+        
+    def closeSession():
+        if (self.session is not None): self.session.close()`
         
     def sleepPrinted(period = 30):
         print('Sleeping for '+ str(period) +' seconds')
@@ -23,9 +30,9 @@ class MALScraper:
            else: print('.', end='', flush=True)
         print(str(period))
     
-    # sleep for some random amount of time between 0.04 and 4 seconds; to avoid http error 429 (too many requests)
+    # sleep for some random amount of time between 0.2 and 4 seconds; to avoid http error 429 (too many requests)
     def sleepRandom():
-        randPeriod = float(random.randrange(1,100))/float(25)
+        randPeriod = float(random.randrange(5,100))/float(25)
         time.sleep(randPeriod)
     
     # returns a tuple containing the attributes of a single anime
@@ -38,7 +45,7 @@ class MALScraper:
         animeTitleSynonyms = ''
         animeAirDate = None
         animeURL = url
-        animeStudios = []
+        animeStudioList = []
         # attribute paths/patterns
         aIDPattern = '/anime/(\d+)/'
         aTitlePath = '/html/body/div[@id="myanimelist"]/div[3]/div[@id="contentWrapper"]/div[1]/h1/span/text()'
@@ -82,7 +89,11 @@ class MALScraper:
                     studioURL = studioLink.xpath('./@href', smart_strings=False)[0]
                     studioID = studioIDRegex.match(studioURL).group(1)
                     studioName = studioLink.xpath('./text()', smart_strings=False)[0]
-                    animeStudios.append((studioID, studioName, studioURL))
+                    animeStudioList.append({
+                        'ID':studioID, 
+                        'Name':studioName, 
+                        'URL':studioURL
+                    })
                 #animePageResult = [str for str in [s.strip() for s in animePageResult] if str != '']
                 success = True
                 break
@@ -95,7 +106,15 @@ class MALScraper:
                     attempt += 1
                     
         if (success):
-            return (animeID, animeTitle, animeAirDate, animeTitleEnglish, animeTitleSynonyms, url, animeStudios) # change to dictionary?
+            return {
+                'ID':animeID, 
+                'Title':animeTitle, 
+                'AirDate':animeAirDate, 
+                'TitleEnglish':animeTitleEnglish, 
+                'TitleSynonyms':animeTitleSynonyms, 
+                'URL':url, 
+                'StudioList':animeStudioList
+            }
         elif (attempt < attemptsAllowed): #404
             return None
         else:
@@ -149,15 +168,32 @@ class MALScraper:
                         cVAID = int(personIDRegex.match(cVAURL).group(1))
                         cVAName = VA.xpath(cVANamePath, smart_strings=False)[0]
                         cVALang = VA.xpath(cVALangPath, smart_strings=False)[0]
-                        cVAList.append((cVAID, cVAName, cVAURL, cVALang))
-                    characterList.append((cID, animeID, cName, cRole, cURL, cVAList))
+                        cVAList.append({
+                            'ID':cVAID, 
+                            'Name':cVAName, 
+                            'URL':cVAURL, 
+                            'Language':cVALang
+                        })
+                    characterList.append({
+                        'ID':cID, 
+                        'AnimeID':animeID, 
+                        'Name':cName, 
+                        'Role':cRole, 
+                        'URL':cURL, 
+                        'VoiceActorList':cVAList
+                    })
                 # Staff
                 for staffTree in htmlTree.xpath(staffPath):
                     staffURL = staffTree.xpath(staffURLPath, smart_strings=False)[0]
                     staffID = int(personIDRegex.match(staffURL).group(1))
                     staffName = staffTree.xpath(staffNamePath, smart_strings=False)[0]
                     staffPositions = staffTree.xpath(staffPositionsPath, smart_strings=False)[0]
-                    staffList.append((staffID, staffName, staffURL, staffPositions))
+                    staffList.append({
+                        'ID':staffID, 
+                        'Name':staffName, 
+                        'URL':staffURL, 
+                        'Positions':staffPositions
+                    })
                 success = True;
                 break
             else:
@@ -169,7 +205,10 @@ class MALScraper:
                     attempt += 1
                     
         if (success):
-            return (characterList, staffList)
+            return {
+                'CharacterList':characterList, 
+                'StaffList':staffList
+            }
         elif (attempt == attemptsAllowed):
             print('Something went wrong scraping character page. Character: ' + url)
             sys.exit()
@@ -225,7 +264,12 @@ class MALScraper:
                 sleepPrinted(30)
         
         if (success):
-            return (personID, personName, personBirthday, url)
+            return {
+                'ID':personID, 
+                'Name':personName, 
+                'Birthday':personBirthday, 
+                'URL':url
+            }
         elif (attempt < MALScraper.attemptsAllowed): #404
             return None
         else: # stop scrape so that problem can be found
