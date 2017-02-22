@@ -67,7 +67,7 @@ class MALScraper:
                 animeID = int(re.match(aIDPattern, url).group(1))
                 # Title
                 animeTitle = htmlTree.xpath(aTitlePath, smart_strings=False)[0]
-                sideBarTree = htmlTree.xpath(sideBarPath)[0]                             # side bar subtree
+                sideBarTree = htmlTree.xpath(sideBarPath)[0] # side bar subtree
                 # Air Date
                 try:
                     airDateStr = sideBarTree.xpath(aAirDatePath, smart_strings=False)[1] # raw date string
@@ -122,7 +122,7 @@ class MALScraper:
             sys.exit()
         
 
-    # returns a tuple containing list of character tuples and a list of staff tuples. each character tuple will contain a list of voice actors tuples.
+    # returns a dictionary containing list of character tuples and a list of staff tuples. each character tuple will contain a list of voice actors tuples.
     def staffScrape(url):
         # url in form '/anime/[show id]/[show name]/characters'
         # returned lists
@@ -215,7 +215,7 @@ class MALScraper:
         else: #404
             return None
     
-    # returns a tuple of attributes of a single person from the given url of that person's webpage
+    # returns a dictionary of attributes of a single person from the given url of that person's webpage
     def personScrape(url):
         # url in form '/people/[person id]/[person name]'
         # returned person attributes

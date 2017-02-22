@@ -21,6 +21,21 @@ def printUnicode(output):
 
 # LET EXCEPTIONS HAPPEN MAYBE INSTEAD OF CHECK: IS MORE EFFICIENT
 
+
+# Anime 
+    -> Genre    -> AnimeGenre   #Sidebar
+    -> Studio   -> AnimeStudio  #Sidebar
+    -> Character ->  AnimeCharacter 
+
+# anime, genre, studio, character, person
+# AnimeGenre, AnimeStudio, AnimeCharacter, AnimeStaff
+# VoiceRole, Staff
+
+# Anime
+# - AnimeStudio - Role - Staff
+# Studio Person
+ 
+
 scraper = MALScraper()
 db = MALDb()
 # Scrape user's anime list for urls
