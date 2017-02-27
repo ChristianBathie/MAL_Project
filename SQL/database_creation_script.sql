@@ -21,7 +21,7 @@ USE `mal_project` ;
 CREATE TABLE IF NOT EXISTS `mal_project`.`Anime` (
   `id` INT NOT NULL COMMENT 'Same as MAL DB ID',
   `title` VARCHAR(150) NOT NULL,
-  `releaseDate` DATE NULL,
+  `releaseDate` DATE NULL DEFAULT '1900-01-01',
   `titleEnglish` VARCHAR(150) NULL,
   `titleSynonyms` VARCHAR(450) NULL,
   `memberCount` INT NULL,
@@ -42,7 +42,6 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `mal_project`.`Studio` (
   `id` INT NOT NULL COMMENT 'Same as MAL DB ID',
   `studioName` VARCHAR(60) NOT NULL,
-  `url` VARCHAR(100) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC))
 ENGINE = InnoDB;
@@ -80,7 +79,6 @@ CREATE TABLE IF NOT EXISTS `mal_project`.`Person` (
   `fullname` VARCHAR(60) NOT NULL,
   `birthday` DATE NULL,
   `favouriteCount` INT NULL,
-  `url` VARCHAR(120) NULL,
   `image` VARCHAR(20) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC))
@@ -135,7 +133,6 @@ CREATE TABLE IF NOT EXISTS `mal_project`.`CharacterProfile` (
   `id` INT NOT NULL COMMENT 'Same as MAL DB ID',
   `fullname` VARCHAR(60) NOT NULL,
   `favouriteCount` INT NULL,
-  `url` VARCHAR(120) NULL,
   `image` VARCHAR(20) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC))
@@ -244,8 +241,8 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `mal_project`;
-INSERT INTO `mal_project`.`Studio` (`id`, `studioName`, `url`) VALUES (1, 'Studio Pierrot', NULL);
-INSERT INTO `mal_project`.`Studio` (`id`, `studioName`, `url`) VALUES (314, 'White Fox', NULL);
+INSERT INTO `mal_project`.`Studio` (`id`, `studioName`) VALUES (1, 'Studio Pierrot');
+INSERT INTO `mal_project`.`Studio` (`id`, `studioName`) VALUES (314, 'White Fox');
 
 COMMIT;
 
@@ -265,8 +262,8 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `mal_project`;
-INSERT INTO `mal_project`.`Person` (`id`, `fullname`, `birthday`, `favouriteCount`, `url`, `image`) VALUES (1602, 'John Michael Tatum', '1976-05-25', NULL, '', NULL);
-INSERT INTO `mal_project`.`Person` (`id`, `fullname`, `birthday`, `favouriteCount`, `url`, `image`) VALUES (16915, 'Gaku Iwasa', '1974-02-05', NULL, NULL, NULL);
+INSERT INTO `mal_project`.`Person` (`id`, `fullname`, `birthday`, `favouriteCount`, `image`) VALUES (1602, 'John Michael Tatum', '1976-05-25', NULL, NULL);
+INSERT INTO `mal_project`.`Person` (`id`, `fullname`, `birthday`, `favouriteCount`, `image`) VALUES (16915, 'Gaku Iwasa', '1974-02-05', NULL, NULL);
 
 COMMIT;
 
@@ -296,7 +293,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `mal_project`;
-INSERT INTO `mal_project`.`CharacterProfile` (`id`, `fullname`, `favouriteCount`, `url`, `image`) VALUES (35252, 'Rintarou Okabe', 30207, NULL, NULL);
+INSERT INTO `mal_project`.`CharacterProfile` (`id`, `fullname`, `favouriteCount`, `image`) VALUES (35252, 'Rintarou Okabe', 30207, NULL);
 
 COMMIT;
 

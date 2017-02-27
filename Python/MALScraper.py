@@ -1,4 +1,4 @@
-import requests, re, json, sys, time, maldb, random
+import requests, re, json, sys, time, random
 from lxml import html,etree
 from datetime import datetime
 
@@ -11,7 +11,7 @@ class MALScraper:
             session = requests.Session()
         self.session = session
         
-    def resetSession(sleepPeriod = 0):
+    def resetSession(self, sleepPeriod = 0):
         print('Scraper: resetting session')
         self.session.close()
         self.session = None
@@ -19,10 +19,10 @@ class MALScraper:
             sleepPrinted(sleepPeriod)
         self.session = requests.Session()
         
-    def closeSession():
-        if (self.session is not None): self.session.close()`
+    def closeSession(self):
+        if (self.session is not None): self.session.close()
         
-    def sleepPrinted(period = 30):
+    def sleepPrinted(self, period = 30):
         print('Sleeping for '+ str(period) +' seconds')
         for i in range(period):
            time.sleep(1)
@@ -31,35 +31,50 @@ class MALScraper:
         print(str(period))
     
     # sleep for some random amount of time between 0.2 and 4 seconds; to avoid http error 429 (too many requests)
-    def sleepRandom():
+    def sleepRandom(self):
         randPeriod = float(random.randrange(5,100))/float(25)
         time.sleep(randPeriod)
     
     # returns a tuple containing the attributes of a single anime
-    def animeScrape(url):
+    def scrapeAnime(self, url):
         # url in form '/anime/[show id]/[show name]'
         # returned anime attributes
         animeID = 0
         animeTitle = ''
         animeTitleEnglish = ''
         animeTitleSynonyms = ''
-        animeAirDate = None
+        animeReleaseDate = None
+        animeScoreValue = 0.0
+        animeScoreCount = 0
+        animeMemberCount = 0
+        animeFavouriteCount= 0
         animeURL = url
+        animeImage = ''
         animeStudioList = []
+        animeGenreList = []
         # attribute paths/patterns
         aIDPattern = '/anime/(\d+)/'
         aTitlePath = '/html/body/div[@id="myanimelist"]/div[3]/div[@id="contentWrapper"]/div[1]/h1/span/text()'
         sideBarPath = '/html/body/div[@id="myanimelist"]/div[3]/div[@id="contentWrapper"]/div[@id="content"]/table/tr/td[1]/div'
-        aTitleEnglishPath = './div[span/text()="English:"]/text()'  # relative to sideBarPath
-        aTitleSynonymsPath = './div[span/text()="Synonyms:"]/text()'# relative to sideBarPath
-        aAirDatePath = './div[span/text()="Aired:"]/text()'         # relative to sideBarPath
-        aStudiosPath = './div[span/text()="Studios:"]/a'            # relative to sideBarPath
-        studioIDRegex = re.compile('/anime/producer/(\d+)/')        # for matching url from link in side bar
+        # - relative to sideBarPath
+        aTitleEnglishPath = './div[span/text()="English:"]/text()'
+        aTitleSynonymsPath = './div[span/text()="Synonyms:"]/text()'
+        aAirDatePath = './div[span/text()="Aired:"]/text()'
+        aStudioPath = './div[span/text()="Studios:"]/a'
+        studioIDRegex = re.compile('/anime/producer/(\d+)/') # for match using url from link in side bar
+        aGenrePath = './div[span/text()="Genres:"]/a'
+        aGenreIDPattern = '/anime/genre/(\d+)/'
+        aScoreValuePath = './div[@itemprop="aggregateRating"]/span[@itemprop="ratingValue"]/text()'
+        aScoreCountPath = './div[@itemprop="aggregateRating"]/span[@itemprop="ratingCount"]/text()'
+        aMemberCountPath = './div[span/text()="Members:"]/text()'
+        aFavouriteCountPath = './div[span/text()="Favorites:"]/text()'
+        aImageURLPath = './div[1]/a/img/@src'
+        aImagePattern = 'https://myanimelist.cdn-dena.com/images/anime/(.*)' # https://myanimelist.cdn-dena.com/images/anime/5/73199.jpg
         
         success = False
         attempt = 0
         while(attempt < MALScraper.attemptsAllowed):
-            sleepRandom()
+            self.sleepRandom()
             animePage = self.session.get('https://myanimelist.net' + url)
             if (animePage.status_code == 200):
                 htmlTree = html.fromstring(animePage.text)
@@ -73,9 +88,9 @@ class MALScraper:
                     airDateStr = sideBarTree.xpath(aAirDatePath, smart_strings=False)[1] # raw date string
                     tempList = airDateStr.split()
                     airDateStr = tempList[0] + tempList[1] + tempList[2]
-                    animeAirDate = datetime.strptime(airDateStr, '%b%d,%Y').date().isoformat()
+                    animeReleaseDate = datetime.strptime(airDateStr, '%b%d,%Y').date().isoformat()
                 except:
-                    animeAirDate = None
+                    animeReleaseDate = None
                 # Title: English
                 engList = sideBarTree.xpath(aTitleEnglishPath, smart_strings=False)
                 if len(engList)>1: 
@@ -84,15 +99,33 @@ class MALScraper:
                 synList = sideBarTree.xpath(aTitleSynonymsPath, smart_strings=False)
                 if len(synList)>1: 
                     animeTitleSynonyms = synList[1].strip()
+                # Score
+                animeScoreValue = float(sideBarTree.xpath(aScoreValuePath, smart_strings=False)[0])
+                animeScoreCount = int(sideBarTree.xpath(aScoreCountPath, smart_strings=False)[0].replace(',', ''))
+                # Members
+                animeMemberCount = int(sideBarTree.xpath(aScoreCountPath, smart_strings=False)[0].strip().replace(',', ''))
+                print('Members:', animeMemberCount)
+                # Favourites
+                animeFavouriteCount = int(sideBarTree.xpath(aFavouriteCountPath, smart_strings=False)[1].strip().replace(',', ''))
+                # Image
+                animeImage = re.match(aImagePattern, sideBarTree.xpath(aImageURLPath, smart_strings=False)[0]).group(1)
                 # Studios
-                for studioLink in sideBarTree.xpath(aStudiosPath):
+                for studioLink in sideBarTree.xpath(aStudioPath):
                     studioURL = studioLink.xpath('./@href', smart_strings=False)[0]
                     studioID = studioIDRegex.match(studioURL).group(1)
                     studioName = studioLink.xpath('./text()', smart_strings=False)[0]
                     animeStudioList.append({
                         'ID':studioID, 
-                        'Name':studioName, 
-                        'URL':studioURL
+                        'Name':studioName
+                    })
+                # Genres
+                for genreLink in sideBarTree.xpath(aGenrePath):
+                    genreURL = genreLink.xpath('./@href', smart_strings=False)[0]
+                    genreID = int(re.match(aGenreIDPattern, genreURL).group(1))
+                    genreTitle = genreLink.xpath('./text()', smart_strings=False)[0]
+                    animeGenreList.append({
+                        'ID':genreID,
+                        'Title':genreTitle
                     })
                 #animePageResult = [str for str in [s.strip() for s in animePageResult] if str != '']
                 success = True
@@ -107,13 +140,21 @@ class MALScraper:
                     
         if (success):
             return {
-                'ID':animeID, 
-                'Title':animeTitle, 
-                'AirDate':animeAirDate, 
-                'TitleEnglish':animeTitleEnglish, 
-                'TitleSynonyms':animeTitleSynonyms, 
-                'URL':url, 
-                'StudioList':animeStudioList
+                'anime':{
+                    'id':animeID, 
+                    'title':animeTitle, 
+                    'releaseDate':animeReleaseDate, 
+                    'titleEnglish':animeTitleEnglish, 
+                    'titleSynonyms':animeTitleSynonyms,
+                    'scoreValue':animeScoreValue,
+                    'scoreCount':animeScoreCount,
+                    'memberCount':animeMemberCount,
+                    'favouriteCount':animeFavouriteCount,
+                    'url':url,
+                    'image':animeImage,
+                },
+                'studioList':animeStudioList,
+                'genreList':animeGenreList
             }
         elif (attempt < attemptsAllowed): #404
             return None
@@ -123,7 +164,7 @@ class MALScraper:
         
 
     # returns a dictionary containing list of character tuples and a list of staff tuples. each character tuple will contain a list of voice actors tuples.
-    def staffScrape(url):
+    def scrapeStaff(self, url):
         # url in form '/anime/[show id]/[show name]/characters'
         # returned lists
         characterList = []
@@ -150,7 +191,7 @@ class MALScraper:
         attempt = 0
         success = False;
         while(attempt < MALScraper.attemptsAllowed):
-            sleepRandom()
+            self.sleepRandom()
             characterPage = self.session.get('https://myanimelist.net' + url)
             if (characterPage.status_code == 200):
                 htmlTree = html.fromstring(characterPage.text)
@@ -170,17 +211,15 @@ class MALScraper:
                         cVALang = VA.xpath(cVALangPath, smart_strings=False)[0]
                         cVAList.append({
                             'ID':cVAID, 
-                            'Name':cVAName, 
-                            'URL':cVAURL, 
+                            'Name':cVAName,
                             'Language':cVALang
                         })
                     characterList.append({
-                        'ID':cID, 
-                        'AnimeID':animeID, 
-                        'Name':cName, 
-                        'Role':cRole, 
-                        'URL':cURL, 
-                        'VoiceActorList':cVAList
+                        'id':cID, 
+                        'animeID':animeID, 
+                        'name':cName, 
+                        'role':cRole,
+                        'voiceActorList':cVAList
                     })
                 # Staff
                 for staffTree in htmlTree.xpath(staffPath):
@@ -189,10 +228,9 @@ class MALScraper:
                     staffName = staffTree.xpath(staffNamePath, smart_strings=False)[0]
                     staffPositions = staffTree.xpath(staffPositionsPath, smart_strings=False)[0]
                     staffList.append({
-                        'ID':staffID, 
-                        'Name':staffName, 
-                        'URL':staffURL, 
-                        'Positions':staffPositions
+                        'id':staffID, 
+                        'name':staffName,
+                        'positions':staffPositions
                     })
                 success = True;
                 break
@@ -216,7 +254,7 @@ class MALScraper:
             return None
     
     # returns a dictionary of attributes of a single person from the given url of that person's webpage
-    def personScrape(url):
+    def scrapePerson(self, url):
         # url in form '/people/[person id]/[person name]'
         # returned person attributes
         personID = 0
@@ -230,7 +268,7 @@ class MALScraper:
         success = False
         attempt = 0
         while(attempt < MALScraper.attemptsAllowed):
-            sleepRandom()
+            self.sleepRandom()
             personPage = self.session.get('https://myanimelist.net' +  url)
             if (personPage.status_code == 200):
                 personTree = html.fromstring(personPage.text)
@@ -258,17 +296,16 @@ class MALScraper:
                     attempt += 1
             
             # errors continually occurring while trying to load page
-            if (attempt == 10 && success == False):
+            if (attempt == 10 and success == False):
                 attempt = 0
                 print('Something went wrong scraping person page. Person: ' + url)
                 sleepPrinted(30)
         
         if (success):
             return {
-                'ID':personID, 
-                'Name':personName, 
-                'Birthday':personBirthday, 
-                'URL':url
+                'id':personID, 
+                'name':personName, 
+                'birthday':personBirthday,
             }
         elif (attempt < MALScraper.attemptsAllowed): #404
             return None
@@ -277,10 +314,10 @@ class MALScraper:
             sys.exit()
 
     # returns the list of urls from the anime in a given users list
-    def listScrape(username):
+    def scrapeList(self, username):
         # username is a valid MAL username
         # returned list
-        animeURLList = [] 
+        animeURLList = []
         # list paths
         oldListPath = '/html/body/div[@id="list_surround"]/table[position() > 3]/tr/td[2 and @class!="table_header"]/a/@href'
         newListJSONPath = '/html/body/div[@id="list-container"]/div[3]/div/table/@data-items'
@@ -288,7 +325,7 @@ class MALScraper:
         attempt = 0
         success = False
         while(attempt < MALScraper.attemptsAllowed):
-            sleepRandom()
+            self.sleepRandom()
             listPage = self.session.get('https://myanimelist.net/animelist/' + username + '?status=7')
             if (listPage.status_code == 200):
                 htmlTree = html.fromstring(listPage.text)

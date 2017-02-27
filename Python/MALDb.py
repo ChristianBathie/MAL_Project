@@ -2,22 +2,22 @@ import pymysql
 
 class MALDb:
     
-    def __init__(self, connection = None):
-        if connection is None:  
-            self.connection = pymysql.connect(host='localhost', port=3306, user='root', password='admin1234', db='mal_project', charset='utf8')
-        self.cursor = connection.cursor()
+    def __init__(self):
+        self.connection = pymysql.connect(host='localhost', port=3306, user='root', password='admin1234', db='mal_project', charset='utf8')
+        self.cursor = self.connection.cursor()
     
-    def reconnect():
+    def reconnect(self):
+        self.closeConnection()
         self.connection =  pymysql.connect(host='localhost', port=3306, user='root', password='admin1234', db='mal_project', charset='utf8')
-        self.cursor = connection.cursor()
+        self.cursor = self.connection.cursor()
         
-    def closeConnection():
+    def closeConnection(self):
         self.cursor.close()
         self.connection.close()
         self.cursor = None
         self.connection = None
     
-    def printUnicode(output):
+    def printUnicode(self, output):
         try:
             print(output)
         except UnicodeEncodeError:
@@ -28,20 +28,19 @@ class MALDb:
                     print('[unicode]', end='')
             print()
 
-    def insertAnime(id, title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url):
-        anime = (id, title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url) + 
-        (title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url)
+    def insertAnime(self, id, title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url, image):
+        anime = (id, title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url, image) + (title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url, image)
         sql = '''
             INSERT INTO Anime 
-                (id, title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url)
+                (id, title, releaseDate, titleEnglish, titleSynonyms, memberCount, scoreValue, scoreCount, favouriteCount, url, image)
             VALUES 
-                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
-                title=%s, releaseDate=%s, titleEnglish=%s, titleSynonyms=%s, memberCount=%s, scoreValue=%s, scoreCount=%s, favouriteCount=%s, url=%s;
+                title=%s, releaseDate=%s, titleEnglish=%s, titleSynonyms=%s, memberCount=%s, scoreValue=%s, scoreCount=%s, favouriteCount=%s, url=%s, image=%s;
         '''
-        insertGeneral(sql, anime, tableName='Anime')    
+        return self.insertGeneral(sql, anime, tableName='Anime')    
     
-    def insertAnimeCharacter(animeID, characterID, main):
+    def insertAnimeCharacter(self, animeID, characterID, main):
         animeCharacter = (animeID, characterID, main)
         sql ='''
             INSERT INTO AnimeStudio
@@ -49,9 +48,9 @@ class MALDb:
             VALUES 
                 (%s, %s, %s)
         '''
-        insertGeneral(sql, animeCharacter, tableName='AnimeCharacter')
+        self.insertGeneral(sql, animeCharacter, tableName='AnimeCharacter')
     
-    def insertAnimeGenre(animeID, genreID):
+    def insertAnimeGenre(self, animeID, genreID):
         animeGenre = (animeID, genreID)
         sql ='''
             INSERT INTO AnimeGenre
@@ -59,9 +58,9 @@ class MALDb:
             VALUES 
                 (%s, %s)
         '''
-        insertGeneral(sql, animeGenre, tableName='AnimeGenre')
+        self.insertGeneral(sql, animeGenre, tableName='AnimeGenre')
         
-    def insertAnimeStaff(animeID, position):
+    def insertAnimeStaff(self, animeID, position):
         animeStaff = (animeID, position)
         sql ='''
             INSERT INTO AnimeStaff
@@ -69,9 +68,9 @@ class MALDb:
             VALUES 
                 (%s, %s)
         '''
-        insertGeneral(sql, animeStaff, tableName='AnimeStaff')
+        self.insertGeneral(sql, animeStaff, tableName='AnimeStaff')
 
-    def insertAnimeStudio(animeID, studioID):
+    def insertAnimeStudio(self, animeID, studioID):
         animeStudio = (animeID, studioID)
         sql ='''
             INSERT INTO AnimeStudio
@@ -79,21 +78,21 @@ class MALDb:
             VALUES 
                 (%s, %s)
         '''
-        insertGeneral(sql, animeStudio, tableName='AnimeStudio')
+        self.insertGeneral(sql, animeStudio, tableName='AnimeStudio')
 
-    def insertCharacter(id, fullname, favouriteCount, url, image):
-        character = (id, fullname, favouriteCount, url, image) + (fullname, favouriteCount, url, image)
+    def insertCharacter(self, id, fullname, favouriteCount, image):
+        character = (id, fullname, favouriteCount,image) + (fullname, favouriteCount, image)
         sql = '''
             INSERT INTO mal_project.CharacterProfile
-                (id, fullname, favouriteCount, url, image)
+                (id, fullname, favouriteCount, image)
             VALUES
-                (%s, %s, %s, %s, %s)
+                (%s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 fullname=%s, favouriteCount=%s, image=%s;
         '''
-        insertGeneral(sql, character, tableName='CharacterProfile')
+        self.insertGeneral(sql, character, tableName='CharacterProfile')
         
-    def insertGenre(genreID, title):
+    def insertGenre(self, genreID, title):
         genre = (genreID, title)
         sql = '''
             INSERT INTO mal_project.Genre 
@@ -101,21 +100,21 @@ class MALDb:
             VALUES 
                 (%s, %s)
         '''
-        insertGeneral(sql, genre, tableName='Genre')
+        self.insertGeneral(sql, genre, tableName='Genre')
 
-    def insertPerson(id, fullname, birthday, favouriteCount, url, image):
-        person = (id, fullname, birthday, favouriteCount, url, image) + (fullname, birthday, favouriteCount, url, image)
+    def insertPerson(self, id, fullname, birthday, favouriteCount, image):
+        person = (id, fullname, birthday, favouriteCount, image) + (fullname, birthday, favouriteCount, image)
         sql = '''
             INSERT INTO mal_project.Person 
-                (id, fullname, birthday, favouriteCount, url, image) 
+                (id, fullname, birthday, favouriteCount, image) 
             VALUES 
-                (%s, %s, %s, %s, %s, %s)
+                (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 fullname=%s, birthday=%s, favouriteCount=%s, image=%s;
         '''
-        insertGeneral(sql, person, tableName='Person')
+        self.insertGeneral(sql, person, tableName='Person')
 
-    def insertStaff(personID, animeStaffID):
+    def insertStaff(self, personID, animeStaffID):
         staff = (personID, animeStaffID)
         sql = '''
             INSERT INTO mal_project.Staff 
@@ -123,21 +122,21 @@ class MALDb:
             VALUES 
                 (%s, %s)
         '''
-        insertGeneral(sql, staff, tableName='Staff')
+        self.insertGeneral(sql, staff, tableName='Staff')
 
-    def insertStudio(id, name, url):
-        studio = (id, name, url) + (name, url)
+    def insertStudio(self, id, name):
+        studio = (id, name) + (name,)
         sql = '''
             INSERT INTO mal_project.Studio 
-                (id, studioName, url)
+                (id, studioName)
             VALUES 
-                (%s, %s, %s)
+                (%s, %s)
             ON DUPLICATE KEY UPDATE
-                studioName=%s, url=%s;
+                studioName=%s;
         '''
-        insertGeneral(sql, studio, tableName='Studio')
+        self.insertGeneral(sql, studio, tableName='Studio')
 
-    def insertVoiceRole(idPerson, idAnimeCharacter, language):
+    def insertVoiceRole(self, idPerson, idAnimeCharacter, language):
         role = (idPerson, idAnimeCharacter, language)
         sql = '''
             INSERT INTO mal_project.VoiceRole 
@@ -145,10 +144,10 @@ class MALDb:
             VALUES 
                 (%s, %s, %s)
         '''
-        insertGeneral(sql, role, tableName='VoiceRole')
+        self.insertGeneral(sql, role, tableName='VoiceRole')
        
     # Used to insert new information into the database. Returns true if update is successful, false otherwise
-    def executeGeneral(sql, values, tableName='table name not given'):
+    def insertGeneral(self, sql, values, tableName='table name not given'):
         # print(values)
         try:
             # Execute the SQL command
@@ -166,7 +165,7 @@ class MALDb:
             self.connection.rollback()
             return False
 
-    def updateAnime(animeID, memberCount, scoreValue, scoreCount, favouriteCount):
+    def updateAnime(self, animeID, memberCount, scoreValue, scoreCount, favouriteCount):
         newAnimeValues = (memberCount, scoreValue, scoreCount, favouriteCount) + (animeID,)
         sql = '''
             UPDATE mal_project.Anime
@@ -175,7 +174,7 @@ class MALDb:
         '''
         executeGeneral(sql, newAnimeValues, tableName='Anime')
     
-    def selectAnime(url):
+    def selectAnime(self, url):
         sql = 'SELECT * FROM mal_project.Anime WHERE url = %s'
         try:
             # Execute the SQL command
@@ -187,7 +186,7 @@ class MALDb:
             print(e)
             return None
             
-    def selectAllColumn(table, column):
+    def selectAllColumn(self, table, column):
         sql = 'SELECT %s FROM mal_project.%s' % (column, table)
         try:
             # Execute the SQL command
@@ -199,7 +198,7 @@ class MALDb:
             print(e)
             return None
 
-    def selectSingle(table, column, value):
+    def selectSingle(self, table, column, value):
         sql = 'SELECT * FROM mal_project.%s WHERE %s = ' % (table, column)
         sql += '%s'
         try:
