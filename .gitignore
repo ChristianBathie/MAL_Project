@@ -1,3 +1,10 @@
+# General #
 */desktop.ini
 NodeJS_Server/public/json/
 NodeJS_Server/public/tmp/
+
+# Artifacts #
+__pycache__/
+
+# PyCharm #
+.idea/

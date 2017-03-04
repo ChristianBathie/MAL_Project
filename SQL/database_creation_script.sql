@@ -20,7 +20,7 @@ USE `mal_project` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mal_project`.`Anime` (
   `id` INT NOT NULL COMMENT 'Same as MAL DB ID',
-  `title` VARCHAR(150) NOT NULL,
+  `title` VARCHAR(150) NULL,
   `releaseDate` DATE NULL DEFAULT '1900-01-01',
   `titleEnglish` VARCHAR(150) NULL,
   `titleSynonyms` VARCHAR(450) NULL,
@@ -76,7 +76,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mal_project`.`Person` (
   `id` INT NOT NULL,
-  `fullname` VARCHAR(60) NOT NULL,
+  `fullname` VARCHAR(60) NULL,
   `birthday` DATE NULL,
   `favouriteCount` INT NULL,
   `image` VARCHAR(20) NULL,
@@ -131,7 +131,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mal_project`.`CharacterProfile` (
   `id` INT NOT NULL COMMENT 'Same as MAL DB ID',
-  `fullname` VARCHAR(60) NOT NULL,
+  `fullname` VARCHAR(60) NULL,
   `favouriteCount` INT NULL,
   `image` VARCHAR(20) NULL,
   PRIMARY KEY (`id`),

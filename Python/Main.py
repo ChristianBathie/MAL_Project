@@ -1,18 +1,9 @@
-import requests, re, json, sys, time, random
+import sys
+import time
+import random
 from MALDb import MALDb 
-from MALScraper import MALScraper 
-
-def printUnicode(output):
-    try:
-        print(output)
-    except UnicodeEncodeError:
-        for c in output:
-            try:
-                print(c, end='')
-            except UnicodeEncodeError:
-                print('[unicode]', end='')
-        print()
-
+from MALScraper import MALScraper
+from MyPrint import MyPrint
 
 # MyList -> anime/characters -> scrape characters/people 
 # -> for each character: insert character, 
@@ -36,116 +27,112 @@ def printUnicode(output):
 # Anime
 # - AnimeStudio - Role - Staff
 # Studio Person
- 
+
+
 def main():
     scraper = MALScraper()
     db = MALDb()
     # Scrape user's anime list for urls
     username = 'TrashPandaButts'
-    animeURLList = scraper.scrapeList(username)
+    animeURLList = scraper.scrape_list(username)
     # Scrape any anime page that isn't already in database
     for url in animeURLList:
-        if db.selectSingle(table='Anime', column='url', value=url) is None:
-            anime = scraper.scrapeAnime(url)
-            db.insertAnime(*anime.values()[:-1])
+        if db.select_single(table='Anime', column='url', value=url) is None:
+            anime = scraper.scrape_anime(url)
+            db.insert_anime(*anime.values()[:-1])
             for studio in anime['StudioList']:
-                db.insertStudio(**studio)
-                db.insertAnimeStudio(anime['ID'], studio['ID'])
+                db.insert_studio(**studio)
+                db.insert_animestudio(anime['ID'], studio['ID'])
     # for all anime in the database
-    animeList = db.selectAllColumn('Anime', 'id, title, url')
+    animeList = db.select_all_column('Anime', 'id, title, url')
+    scrapeCycles = 0
     for anime in animeList:
         ## print('\n--------------------------------------------------------------------------------')
         ## print('  ' + str(i))
         ## printUnicode('  ' + anime[1])
         ## print('--------------------------------------------------------------------------------\n')
-        staffTuple = scraper.scrapeStaff(anime['URL']+'/characters')
-        for character in staffTuple['CharacterList']:
-            db.insertCharacter(*character.values()[:-1])
+        dictAnimeStaff = scraper.scrape_animestaff(anime['url']+'/characters')
+        for character in dictAnimeStaff['CharacterList']:
+            db.insert_character(*character.values()[:-1])
             for person in character['VoiceActorList']:
-                if db.selectSingle('Person', 'id', person['ID']) is None:
-                    p = scraper.scrapePerson(person['URL'])
-                    db.insertPerson(**p)
-                db.insertVoiceRole(person['ID'], character['ID'], person['Language'])
-        for staff in staffTuple['StaffList']:
-            if db.selectSingle(table='Person', column='id', value=staff['ID']) is None:
-                p = scraper.scrapePerson(staff['URL'])
-                db.insertPerson(**p)
-            db.insertStaff(anime['ID'], staff['ID'], staff['Positions'])
-        i += 1
-        if (i%8 == 0):
-            session.close()
-            print('sleeping then refreshing session every 8 anime')
-            print('Sleeping for 1 min')
-            for j in range(60):
-               time.sleep(1)
-               if j%5 == 0: print(j, end='', flush=True)
-               else: print('.', end='', flush=True)
-            print('60')
-            session = requests.Session()
+                if db.select_single('Person', 'id', person['ID']) is None:
+                    p = scraper.scrape_person(person['URL'])
+                    db.insert_person(**p)
+                db.insert_voicerole(person['ID'], character['ID'], person['Language'])
+        for staff in dictAnimeStaff['StaffList']:
+            if db.select_single(table='Person', column='id', value=staff['ID']) is None:
+                p = scraper.scrape_person(staff['URL'])
+                db.insert_person(**p)
+            #db.insert_staff(anime['idAnime'], staff['idStaff'], staff['positions'])
+        scrapeCycles += 1
+        if scrapeCycles % 8 == 0:
+            scraper.session_reset(5)
+
+
+def complete_collection():
+    return
+
+
+def anime_collection(scraper, db, animeurllist):
+    for animeurl in animeurllist:
+        dictAnime = scraper.scrape_anime(animeurl)
+        db.insert_anime(**dictAnime['anime'])
+        for studio in dictAnime['studioList']:
+            db.insert_studio(**studio)
+            db.insert_animestudio(dictAnime['anime']['idAnime'], studio['idStudio'])
+        for genre in dictAnime['genreList']:
+            db.insert_genre(**genre)
+            db.insert_animegenre(dictAnime['anime']['idAnime'], genre['idGenre'])
+    return
+
+
+def character_collection():
+    return
+    # get list of all characters in database
+    # for each character in database
+    #   - scrape character page (name, favourites, image, anime(id, name?))
+
+
+def person_collection():
+    return
+    # get list of people in database
+    # for each person in database
+    # - scrape person page (birthday, favourites, image)
+
 
 def test():
-    scraper = MALScraper()
-    db = MALDb()
-    dictAnime = scraper.scrapeAnime('/anime/1/Cowboy_Bebop')
-    for key in dictAnime['anime']:
-        print (key, ': ', dictAnime['anime'][key])
-    if (db.insertAnime(**dictAnime['anime'])):
-        print('Insert successful')
-    else: 
-        print('Insert failed')
-        
-test()
-# result = maldb.selectSingle('person', 'url', resultList[i])
-# if result != None: print(result)
-# else: print('No result found')
-        
-    # sys.exit()
-    # i = 1
-    # for anime in resultList:
-        # try:
-            # print(str(i) + '.', end=' ')
-            # print(anime)
-        # except UnicodeEncodeError:
-            # for c in anime:
-                # try:
-                    # print(c, end='')
-                # except UnicodeEncodeError:
-                    # print('[unicode]', end='')
-            # print()
-        # finally:
-            # i += 1
+    dictAnime = scraper.scrape_anime('/anime/1/Cowboy_Bebop')
+    db.insert_anime(**dictAnime['anime'])
+    for studio in dictAnime['studioList']:
+        db.insert_studio(**studio)
+        db.insert_animestudio(dictAnime['anime']['idAnime'], studio['idStudio'])
+        # insert Studio
+        # insert AnimeStudio (FK: anime, studio)
+    for genre in dictAnime['genreList']:
+        db.insert_genre(**genre)
+        db.insert_animegenre(dictAnime['anime']['idAnime'], genre['idGenre'])
+        # insert Genre
+        # insert AnimeGenre (FK: anime, genre)
+    # Scrape character page
+    # staffTuple = scraper.scrape_animestaff('/anime/1/Cowboy_Bebop'+'/characters')
+    # for character in staffTuple['CharacterList']:
+    #     print(character)
+    #     # insert Character
+    #     # insert AnimeCharacter (FK: anime, character)
+    #     # insert Person
+    #     # insert Voicerole (FK: person, animecharacter)
+    # # Scrape person
+    # for staff in staffTuple['StaffList']:
+    #     print(staff)
+    #     # insert Person
+    #     # insert Person (FK: anime)
+    #     # insert Staff (FK: person, animestaff)
+    # if db.insert_anime(**dictAnime['anime']):
+    #     print('Insert successful')
+    # else:
+    #     print('Insert failed')
 
-# # get data-items attribute from anime list table
-# unformattedResultList = htmlTree.xpath('//*[@id="list-container"]/div[3]/div/table/@data-items')
-# # concatenate list items into a single string so they can be "cleaned"
-# unformattedResultStr = ''.join(unformattedResultList)
-# # "clean" results string by replacing escape characters
-# unformattedResultStr = bytes(unformattedResultStr.replace('\\/', '/'), 'ascii').decode('unicode-escape')# maybe don't need url, will unicode have additional \ in front of them?
-
-# mypattern = r'''
-    # "anime_title":"(.*?)".*?
-    # "anime_id":(\d+).*?
-    # "anime_url":"(.*?)"         
-# '''
-# titleRegex = re.compile(mypattern, re.M|re.I|re.X)
-# resultList = titleRegex.findall(unformattedResultStr)
-# resultList.sort()
-# i = 1
-# for tuple in resultList:
-    # try:
-        # print(str(i) + '.', end=' ')
-        # print(str(tuple))
-    # except UnicodeEncodeError:
-        # for c in str(tuple):
-            # try:
-                # print(c, end='')
-            # except UnicodeEncodeError:
-                # print('[unicode]', end='')
-        # print()
-    # finally:
-        # i += 1
-        
-#listClass = tree.xpath('/html/body/@class')
-#if (listClass == 'ownlist'):
-#elif (listClass == 'ownlist anime'):
-#else:
+scraper = MALScraper()
+db = MALDb()
+animeurllist = scraper.scrape_list('TrashPandaButts')
+anime_collection(scraper, db, animeurllist)
